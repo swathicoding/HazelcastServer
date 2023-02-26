@@ -1,0 +1,53 @@
+package com.example.demo.configuration;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+
+public class KeyGenerator {
+	
+	static String publicKeyStr = "";
+    static String privateKeyStr = "";
+    
+    public static void main(String[] args) throws Exception {
+    	encrypt();
+    }
+	public static void encrypt() throws Exception {
+		try {
+			// Generate an RSA key pair with a key size of 2048 bits
+	        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+	        keyGen.initialize(2048);
+	        KeyPair keyPair = keyGen.generateKeyPair();
+
+	        // Get the public and private keys
+	        byte[] publicKey = keyPair.getPublic().getEncoded();
+	        byte[] privateKey = keyPair.getPrivate().getEncoded();
+
+	        // Print the keys as base64-encoded strings
+	        publicKeyStr = java.util.Base64.getEncoder().encodeToString(publicKey);
+	        privateKeyStr = java.util.Base64.getEncoder().encodeToString(privateKey);
+	        System.out.println("Public key: " + publicKeyStr);
+	        System.out.println("Private key: " + privateKeyStr);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		
+//		String publicKey = "your-public-key"; // load the public key from a file or a database
+//		String privateKey = "your-private-key"; // load the private key from a secure location
+
+		String plainTextPassword = "your-database-password";
+		byte[] encryptedPassword = EncoderandDecoder.encrypt(publicKeyStr, plainTextPassword);
+		// store the encrypted password in a secure location, such as a configuration file or a database
+		
+		
+		// when you need to access the database, retrieve the encrypted password and decrypt it
+		String decryptedPassword = EncoderandDecoder.decrypt(privateKeyStr, encryptedPassword);
+		System.out.println("Decrypted TEXT -----" + decryptedPassword);
+		// use the decrypted password to connect to the database
+
+	}
+	
+
+
+	
+}

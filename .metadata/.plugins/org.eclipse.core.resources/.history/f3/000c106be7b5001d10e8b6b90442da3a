@@ -1,0 +1,37 @@
+package com.example.demo.configuration;
+
+
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.spec.*;
+import java.util.Base64;
+
+import javax.crypto.*;
+import javax.crypto.spec.*;
+
+public class EncoderandDecoder {
+	
+	  private static final String RSA_ALGORITHM = "RSA";
+
+	  public static byte[] encrypt(String publicKey, String plainText) throws Exception {
+	    byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
+	    X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+	    KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
+	    PublicKey publicKey = keyFactory.generatePublic(keySpec);
+	    Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
+	    cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+	    byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+	    return Base64.getEncoder().encode(cipherText);
+	  }
+
+	  public static String decrypt(String privateKey, byte[] cipherText) throws Exception {
+	    byte[] privateKeyBytes = Base64.getDecoder().decode(privateKey);
+	    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+	    KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
+	    PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+	    Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
+	    cipher.init(Cipher.DECRYPT_MODE, privateKey);
+	    byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+	    return new String(plainText, StandardCharsets.UTF_8);
+	  }
+}
